@@ -1,2 +1,2 @@
-# m-websocket
-基于javascript的websocket
+# easy-websocket
+基于es6的websocket
