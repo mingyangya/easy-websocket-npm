@@ -81,7 +81,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 var _data = (typeof data === "undefined" ? "undefined" : _typeof(data)) === "object" ? JSON.stringify(data) : data;
                 if (this.ws.readyState === 1) {
                     // 当为OPEN时
-                    console.log('fa');
                     this.ws.send(_data);
                 }
             }

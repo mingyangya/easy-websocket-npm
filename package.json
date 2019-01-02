@@ -2,7 +2,7 @@
   "name": "easy-websocket",
   "version": "0.0.1",
   "description": "基于es6的websocket",
-  "main": "src/index.js",
+  "main": "release/easy-websocket.js",
   "scripts": {
     "release": "babel src/index.js --out-file release/easy-websocket.js",
     "example": "http-server -p 8000 "
