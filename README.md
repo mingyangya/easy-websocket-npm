@@ -2,7 +2,7 @@
 ## 介绍
 简单、常用的方法
 
-- 文档：[Document](https://github.com/haochn/easy-websocket-npm/README.md)
+- 文档：[Document](./README.md)
 - 源码：[https://github.com/haochn/easy-websocket-npm](https://github.com/haochn/easy-websocket-npm) （欢迎 star）
 
 ## 下载
@@ -58,7 +58,7 @@ easyWebSocket.sendMessage("发送消息！");
 
 - 直接在 [github issues](https://github.com/haochn/easy-websocket-npm/issues) 提交问题
 
-每次升级版本修复的问题记录在[这里](https://github.com/haochn/easy-websocket-npm/ISSUE.md)
+每次升级版本修复的问题记录在[这里](./ISSUE.md)
 
 
 
