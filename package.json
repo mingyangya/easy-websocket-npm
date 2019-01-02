@@ -4,7 +4,7 @@
   "description": "基于es6的websocket",
   "main": "src/index.js",
   "scripts": {
-    "release": "babel src/index.js --out-file release/easy-socket.js",
+    "release": "babel src/index.js --out-file release/easy-websocket.js",
     "example": "http-server -p 8000 "
   },
   "repository": {

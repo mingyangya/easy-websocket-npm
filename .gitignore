@@ -60,5 +60,9 @@ typings/
 # next.js build output
 .next
 
-# wenStorm config
+# webStorm config
 .idea
+
+# zip file
+
+.zip
