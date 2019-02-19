@@ -19,13 +19,17 @@
          * @param {Boolean} [opt.debug=false] 可选值 是否开启调试模式
          * @param {Boolean} [opt.failNum=3] 可选值 连接失败后重连的次数
          * @param {Number} [opt.delayConnectTime=3000] 可选值 重连的延时时间
-         * @param {string} [opt.cmd="ping"] 可选值 ping值
-         * @param {string} [opt.serverType="deamon"] 可选值 socket服务类型
+         * @param {String} [opt.cmd="ping"] 可选值 ping值
+         * @param {String} [opt.serverType="deamon"] 可选值 socket服务类型
+         * @param {Function} [opt.fail=null] 可选值 socket连接失败的回调
+         * @param {Function} [opt.success=null] 可选值 socket连接成功的回调
          */
         constructor(opt) {
             const defaultOpt = {
                 msgCb: ((evet) => {
-                    console.log('接收服务器消息的回调：', evet);
+                    if(this.opt.debug){
+                        console.log('接收服务器消息的回调：', evet);
+                    }
                 }),
                 name: 'default',
                 debug: false,
@@ -34,7 +38,10 @@
                 pingTime: 2000,
                 pongTime: 3000,
                 cmd: false,
-                serverType: "deamon"
+                serverType: "deamon",
+                fail:null,
+                success:null,
+                index:0
             };
             this.opt = Object.assign({}, defaultOpt, opt);
             this.ws = null; // websocket对象
@@ -48,6 +55,8 @@
                 // 连接 websocket 成功
 
                 this.status = 'open';
+                //连接成功
+                this.opt.success&&this.opt.success(this.opt.index);
 
                 if (this.opt.cmd) { //是否开启心跳检测
                     this.heartCheck(this.opt.cmd);
@@ -108,6 +117,7 @@
                     if (this.opt.debug) {
                         console.log(`${this.opt.name}断开，重连websocket失败！`, e);
                     }
+                    this.opt.fail&&this.opt.fail(this.opt.index);
                 }
             } else {
                 if (this.opt.debug) {

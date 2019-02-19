@@ -29,15 +29,21 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
          * @param {Boolean} [opt.debug=false] 可选值 是否开启调试模式
          * @param {Boolean} [opt.failNum=3] 可选值 连接失败后重连的次数
          * @param {Number} [opt.delayConnectTime=3000] 可选值 重连的延时时间
-         * @param {string} [opt.cmd="ping"] 可选值 ping值
-         * @param {string} [opt.serverType="deamon"] 可选值 socket服务类型
+         * @param {String} [opt.cmd="ping"] 可选值 ping值
+         * @param {String} [opt.serverType="deamon"] 可选值 socket服务类型
+         * @param {Function} [opt.fail=null] 可选值 socket连接失败的回调
+         * @param {Function} [opt.success=null] 可选值 socket连接成功的回调
          */
         function EasyWebSocket(opt) {
+            var _this = this;
+
             _classCallCheck(this, EasyWebSocket);
 
             var defaultOpt = {
                 msgCb: function msgCb(evet) {
-                    console.log('接收服务器消息的回调：', evet);
+                    if (_this.opt.debug) {
+                        console.log('接收服务器消息的回调：', evet);
+                    }
                 },
                 name: 'default',
                 debug: false,
@@ -46,7 +52,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 pingTime: 2000,
                 pongTime: 3000,
                 cmd: false,
-                serverType: "deamon"
+                serverType: "deamon",
+                fail: null,
+                success: null,
+                index: 0
             };
             this.opt = Object.assign({}, defaultOpt, opt);
             this.ws = null; // websocket对象
@@ -57,41 +66,43 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         _createClass(EasyWebSocket, [{
             key: "connect",
             value: function connect(data) {
-                var _this = this;
+                var _this2 = this;
 
                 this.ws = new WebSocket(this.opt.url);
                 this.ws.onopen = function (e) {
                     // 连接 websocket 成功
 
-                    _this.status = 'open';
+                    _this2.status = 'open';
+                    //连接成功
+                    _this2.opt.success && _this2.opt.success(_this2.opt.index);
 
-                    if (_this.opt.cmd) {
+                    if (_this2.opt.cmd) {
                         //是否开启心跳检测
-                        _this.heartCheck(_this.opt.cmd);
+                        _this2.heartCheck(_this2.opt.cmd);
                     }
-                    if (_this.opt.debug) {
-                        console.log(_this.opt.name + "\u8FDE\u63A5\u6210\u529F", e);
+                    if (_this2.opt.debug) {
+                        console.log(_this2.opt.name + "\u8FDE\u63A5\u6210\u529F", e);
                     }
                     if (data !== undefined) {
-                        _this.sendMessage(data);
+                        _this2.sendMessage(data);
                     }
                 };
                 this.ws.onmessage = function (evet) {
                     var pingData = void 0;
-                    if (_this.opt.serverType === "deamon") {
+                    if (_this2.opt.serverType === "deamon") {
                         pingData = evet.data.message;
                     } else {
                         pingData = evet.data;
                     }
-                    _this.pingPong = 'pong'; // 服务器端返回pong,修改pingPong的状态
+                    _this2.pingPong = 'pong'; // 服务器端返回pong,修改pingPong的状态
 
-                    return _this.opt.msgCb(evet);
+                    return _this2.opt.msgCb(evet);
                 };
                 this.ws.onerror = function (e) {
-                    _this.errorHandle(e);
+                    _this2.errorHandle(e);
                 };
                 this.ws.onclose = function (err) {
-                    _this.closeHandle(err);
+                    _this2.closeHandle(err);
                 };
             }
         }, {
@@ -109,7 +120,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         }, {
             key: "closeHandle",
             value: function closeHandle() {
-                var _this2 = this;
+                var _this3 = this;
 
                 var e = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'err';
 
@@ -121,17 +132,18 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 if (this.status !== 'close') {
                     if (this.connectNum < this.opt.failNum) {
                         setTimeout(function () {
-                            if (_this2.pingInterval !== undefined && _this2.pongInterval !== undefined) {
+                            if (_this3.pingInterval !== undefined && _this3.pongInterval !== undefined) {
                                 // 清除定时器
-                                clearInterval(_this2.pingInterval);
-                                clearInterval(_this2.pongInterval);
+                                clearInterval(_this3.pingInterval);
+                                clearInterval(_this3.pongInterval);
                             }
-                            _this2.connect(); // 重连
+                            _this3.connect(); // 重连
                         }, this.opt.delayConnectTime);
                     } else {
                         if (this.opt.debug) {
                             console.log(this.opt.name + "\u65AD\u5F00\uFF0C\u91CD\u8FDEwebsocket\u5931\u8D25\uFF01", e);
                         }
+                        this.opt.fail && this.opt.fail(this.opt.index);
                     }
                 } else {
                     if (this.opt.debug) {
@@ -165,30 +177,30 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         }, {
             key: "heartCheck",
             value: function heartCheck(cmd) {
-                var _this3 = this;
+                var _this4 = this;
 
                 // 心跳机制的时间可以自己与后端约定
                 this.pingPong = 'ping'; // ws的心跳机制状态值
                 this.pingInterval = setInterval(function () {
-                    if (_this3.ws.readyState === 1) {
+                    if (_this4.ws.readyState === 1) {
                         // 检查ws为链接状态 才可发送
                         if (typeof cmd !== "string") {
                             cmd = JSON.stringify(cmd);
                         }
-                        _this3.ws.send(cmd); // 客户端发送ping
+                        _this4.ws.send(cmd); // 客户端发送ping
                     }
                 }, this.opt.pingTime);
 
                 this.pongInterval = setInterval(function () {
                     // this.pingPong = false;
-                    if (_this3.pingPong === 'ping') {
-                        _this3.closeHandle('pingPong没有改变为pong'); // 没有返回pong 重启webSocket
+                    if (_this4.pingPong === 'ping') {
+                        _this4.closeHandle('pingPong没有改变为pong'); // 没有返回pong 重启webSocket
                     }
                     // 重置为ping 若下一次 ping 发送失败 或者pong返回失败(pingPong不会改成pong)，将重启.
-                    if (_this3.opt.debug) {
+                    if (_this4.opt.debug) {
                         console.log('返回pong');
                     }
-                    _this3.pingPong = 'ping';
+                    _this4.pingPong = 'ping';
                 }, this.opt.pongTime);
             }
         }]);
