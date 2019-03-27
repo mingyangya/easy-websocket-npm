@@ -1,10 +1,10 @@
 {
   "name": "easy-websocket-npm",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "基于es6的websocket",
   "main": "release/easy-websocket-npm.js",
   "scripts": {
-    "release": "babel src/index.js --out-file release/easy-websocket-npm.js",
+    "release": "npx babel src/index.js --out-file release/easy-websocket-npm.js",
     "example": "http-server -p 8000 "
   },
   "repository": {
@@ -12,8 +12,9 @@
     "url": "git+https://github.com/haochn/easy-websocket-npm.git"
   },
   "devDependencies": {
-    "@babel/polyfill": "^7.2.5",
+    "babel-cli": "^6.26.0",
     "babel-plugin-transform-es2015-arrow-functions": "^6.22.0",
+    "babel-polyfill": "^6.26.0",
     "babel-preset-env": "^1.7.0",
     "http-server": "^0.11.1"
   },

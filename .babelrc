@@ -1,9 +1,16 @@
 {
   "presets": [
-    "env"
+    [
+      "env",
+      {
+        "targets": {
+          "browsers": ["last 2 versions", "ie >= 7"]
+        }
+      }
+    ]
   ],
   "plugins": [
     "transform-es2015-arrow-functions",
-    "@babel/polyfill"
+    "babel-polyfill"
   ]
 }

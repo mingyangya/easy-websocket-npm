@@ -13,6 +13,11 @@
 
 ## 初始化
 
+```bash
+npm install 
+```
+打开浏览器输入 ： [http://127.0.0.1:8000/example/index.html](http://127.0.0.1:8000/example/index.html)
+
 > 引用方式
 
 ## AMD
@@ -52,7 +57,9 @@ easyWebSocket.connect();
 
 // 发送消息
 easyWebSocket.sendMessage("发送消息！");
+
 ```
+
 
 ### 提问
 

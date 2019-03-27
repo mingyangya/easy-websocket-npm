@@ -1,15 +1,12 @@
-<!doctype html>
-<html lang="zh-cn">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>easy-websocket-npm</title>
-</head>
-<body>
-<script src="../release/easy-websocket-npm.js"></script>
-<script>
+require.config({
+    baseUrl: "./",
+    paths : {
+        "easy-websocket-npm":"../release/easy-websocket-npm"
+    }
+});
+
+require(['easy-websocket-npm'],function(EasyWebSocket){
+    // todo something...
 
     var msgCb=function(evet){
         console.log(evet);
@@ -27,6 +24,4 @@
         easyWebSocket.sendMessage("发送消息！");
     },3000)
 
-</script>
-</body>
-</html>
+});
