@@ -152,6 +152,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                         if (this.opt.debug) {
                             console.log(this.opt.name + "\u65AD\u5F00\uFF0C\u91CD\u8FDEwebsocket\u5931\u8D25\uFF01", e);
                         }
+                        if (this.opt.cmd) {
+                            if (this.pingInterval !== undefined && this.pongInterval !== undefined) {
+                                // 清除定时器
+                                clearInterval(this.pingInterval);
+                                clearInterval(this.pongInterval);
+                            }
+                        }
                         this.opt.fail && this.opt.fail(this.opt.index);
                     }
                 } else {

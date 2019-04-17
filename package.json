@@ -1,6 +1,6 @@
 {
   "name": "easy-websocket-npm",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "基于es6的websocket",
   "main": "release/easy-websocket-npm.js",
   "scripts": {

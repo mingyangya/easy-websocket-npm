@@ -126,6 +126,13 @@
                     if (this.opt.debug) {
                         console.log(`${this.opt.name}断开，重连websocket失败！`, e);
                     }
+                    if(this.opt.cmd) {
+                        if (this.pingInterval !== undefined && this.pongInterval !== undefined) {
+                            // 清除定时器
+                            clearInterval(this.pingInterval);
+                            clearInterval(this.pongInterval);
+                        }
+                    }
                     this.opt.fail && this.opt.fail(this.opt.index);
                 }
             } else {
