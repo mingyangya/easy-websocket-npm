@@ -114,6 +114,12 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 };
             }
         }, {
+            key: "onMessage",
+            value: function onMessage(callback) {
+                // 自定义 接受消息函数
+                this.opt.msgCb = callback;
+            }
+        }, {
             key: "sendMessage",
             value: function sendMessage(data) {
                 if (this.opt.debug) {

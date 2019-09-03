@@ -67,7 +67,7 @@
                 }
             };
             this.ws.onmessage = (evet) => {
-                if(this.opt.cmd) {
+                if (this.opt.cmd) {
                     //开启心跳
                     let pingData;
                     switch (this.opt.serverType) {
@@ -95,6 +95,11 @@
             }
         };
 
+        onMessage(callback) {
+            // 自定义 接受消息函数
+            this.opt.msgCb = callback;
+        }
+
         sendMessage(data) {
             if (this.opt.debug) {
                 console.log(`${this.opt.name}发送消息给服务器:`, data);
@@ -113,7 +118,7 @@
             if (this.status !== 'close') {
                 if (this.connectNum < this.opt.failNum) {
                     setTimeout(() => {
-                        if(this.opt.cmd) {
+                        if (this.opt.cmd) {
                             if (this.pingInterval !== undefined && this.pongInterval !== undefined) {
                                 // 清除定时器
                                 clearInterval(this.pingInterval);
@@ -126,7 +131,7 @@
                     if (this.opt.debug) {
                         console.log(`${this.opt.name}断开，重连websocket失败！`, e);
                     }
-                    if(this.opt.cmd) {
+                    if (this.opt.cmd) {
                         if (this.pingInterval !== undefined && this.pongInterval !== undefined) {
                             // 清除定时器
                             clearInterval(this.pingInterval);
@@ -139,7 +144,7 @@
                 if (this.opt.debug) {
                     console.log(`${this.name}websocket手动关闭`);
                 }
-                if(this.opt.cmd) {
+                if (this.opt.cmd) {
                     if (this.pingInterval !== undefined && this.pongInterval !== undefined) {
                         // 清除定时器
                         clearInterval(this.pingInterval);
@@ -194,5 +199,4 @@
     }
 
     return EasyWebSocket;
-
 });

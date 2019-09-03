@@ -8,25 +8,47 @@
     <title>easy-websocket-npm</title>
 </head>
 <body>
+<h3>发送的消息</h3>
+<hr>
+<ul class="send">
+
+</ul>
+<h3>接受的消息</h3>
+<hr>
+<ul class="receive">
+
+</ul>
+
 <script src="../release/easy-websocket-npm.js"></script>
 <script>
 
-    var msgCb=function(evet){
-        console.log(evet);
-        document.write(`服务端返回的消息：${event.data}</br>`);
-    };
+    var
+        send = document.querySelector('.send'),
+        receive = document.querySelector('.receive');
 
 
-    var easyWebSocket=new EasyWebSocket({url:"ws://123.207.167.163:9010/ajaxchattest",debug:true,msgCb});
+    var easyWebSocket = new EasyWebSocket({url: "ws://123.207.167.163:9010/ajaxchattest", debug: true});
 
-    //连接websocket 并发送消息555
-    easyWebSocket.connect("555");
+    //连接websocket,并发送消息！
+    easyWebSocket.connect("连接,并发送消息！");
+
+    var newLi = document.createElement('li');
+    newLi.innerHTML = `<li>连接,并发送消息！</li>`;
+    send.appendChild(newLi);
 
     // 发送消息
-    setTimeout(()=>{
-        easyWebSocket.sendMessage("发送消息！");
-    },3000)
-
+    setTimeout(() => {
+        newLi = document.createElement('li');
+        newLi.innerHTML = `<li>3s后发送消息！</li>`;
+        easyWebSocket.sendMessage("3s后发送消息！");
+        send.appendChild(newLi);
+    }, 3000);
+    easyWebSocket.onMessage((msg) => {
+        console.log(`接受到的消息:`, msg.data);
+        var newLi = document.createElement('li');
+        newLi.innerHTML = `<li>${msg.data}</li>`;
+        receive.appendChild(newLi);
+    })
 </script>
 </body>
 </html>
