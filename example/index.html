@@ -26,8 +26,7 @@
         send = document.querySelector('.send'),
         receive = document.querySelector('.receive');
 
-
-    var easyWebSocket = new EasyWebSocket({url: "ws://123.207.167.163:9010/ajaxchattest", debug: true});
+    var easyWebSocket = new EasyWebSocket({url: "ws://121.40.165.18:8800", debug: true,failNum:-1});
 
     //连接websocket,并发送消息！
     easyWebSocket.connect("连接,并发送消息！");

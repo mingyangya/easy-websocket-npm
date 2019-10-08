@@ -25,9 +25,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
          * @param {Object} opt 参数配置
          * @param {String} opt.url ws的接口
          * @param {Function} opt.msgCb 服务器信息的回调传数据给函数
-         * @param {String} [opt.name=default] 可选值 用于区分ws
+         * @param {String} [opt.name='default'] 可选值 用于区分ws
          * @param {Boolean} [opt.debug=false] 可选值 是否开启调试模式
-         * @param {Boolean} [opt.failNum=3] 可选值 连接失败后重连的次数
+         * @param {Number} [opt.failNum=3] 可选值 连接失败后重连的次数
          * @param {Number} [opt.delayConnectTime=3000] 可选值 重连的延时时间
          * @param {String} [opt.cmd="ping"] 可选值 ping值(心跳命令)
          * @param {String} [opt.serverType="deamon"] 可选值 websocket服务类型
@@ -47,6 +47,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 },
                 name: 'default',
                 debug: false,
+                reconnect: true,
                 failNum: 3,
                 delayConnectTime: 3000,
                 pingTime: 2000,
@@ -140,10 +141,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
                 this.connectNum++;
                 if (this.opt.debug) {
-                    console.log(this.opt.name + "\u65AD\u5F00\uFF0C" + this.opt.delayConnectTime + "ms\u540E\u91CD\u8FDEwebsocket,\u5C1D\u8BD5\u8FDE\u63A5\u7B2C" + this.connectNum + "\u6B21\u3002", e);
+                    console.warn(this.opt.name + "\u65AD\u5F00\uFF0C" + this.opt.delayConnectTime + "ms\u540E\u91CD\u8FDEwebsocket,\u5C1D\u8BD5\u8FDE\u63A5\u7B2C" + this.connectNum + "\u6B21\u3002");
                 }
                 if (this.status !== 'close') {
-                    if (this.connectNum < this.opt.failNum) {
+
+                    if (this.connectNum < this.opt.failNum || this.opt.failNum === -1) {
                         setTimeout(function () {
                             if (_this3.opt.cmd) {
                                 if (_this3.pingInterval !== undefined && _this3.pongInterval !== undefined) {
@@ -156,7 +158,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                         }, this.opt.delayConnectTime);
                     } else {
                         if (this.opt.debug) {
-                            console.log(this.opt.name + "\u65AD\u5F00\uFF0C\u91CD\u8FDEwebsocket\u5931\u8D25\uFF01", e);
+                            console.error(this.opt.name + "\u65AD\u5F00\uFF0C\u91CD\u8FDEwebsocket\u5931\u8D25\uFF01");
                         }
                         if (this.opt.cmd) {
                             if (this.pingInterval !== undefined && this.pongInterval !== undefined) {
@@ -169,7 +171,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     }
                 } else {
                     if (this.opt.debug) {
-                        console.log(this.name + "websocket\u624B\u52A8\u5173\u95ED");
+                        console.warn(this.name + "websocket\u624B\u52A8\u5173\u95ED\uFF01");
                     }
                     if (this.opt.cmd) {
                         if (this.pingInterval !== undefined && this.pongInterval !== undefined) {
@@ -187,7 +189,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
                 // 错误处理
                 if (this.opt.debug) {
-                    console.log(this.opt.name + "\u8FDE\u63A5\u9519\u8BEF:", e);
+                    console.warn(this.opt.name + "\u8FDE\u63A5\u9519\u8BEF\uFF01");
                 }
             }
         }, {
@@ -197,7 +199,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             // 手动关闭WebSocket
             value: function closeMyself() {
                 if (this.opt.debug) {
-                    console.log("\u5173\u95ED" + this.name);
+                    console.warn("\u5173\u95ED" + this.name);
                 }
 
                 this.status = 'close';
@@ -222,7 +224,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
                 this.pongInterval = setInterval(function () {
                     if (_this4.pingPong === 'ping') {
-                        _this4.closeHandle('pingPong没有改变为pong'); // 没有返回pong 重启webSocket
+                        _this4.closeHandle('pingPong没有改变为pong！'); // 没有返回pong 重启webSocket
                     } else {
                         if (_this4.opt.debug) {
                             console.log('返回pong');

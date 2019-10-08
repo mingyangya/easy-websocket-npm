@@ -15,9 +15,9 @@
          * @param {Object} opt 参数配置
          * @param {String} opt.url ws的接口
          * @param {Function} opt.msgCb 服务器信息的回调传数据给函数
-         * @param {String} [opt.name=default] 可选值 用于区分ws
+         * @param {String} [opt.name='default'] 可选值 用于区分ws
          * @param {Boolean} [opt.debug=false] 可选值 是否开启调试模式
-         * @param {Boolean} [opt.failNum=3] 可选值 连接失败后重连的次数
+         * @param {Number} [opt.failNum=3] 可选值 连接失败后重连的次数
          * @param {Number} [opt.delayConnectTime=3000] 可选值 重连的延时时间
          * @param {String} [opt.cmd="ping"] 可选值 ping值(心跳命令)
          * @param {String} [opt.serverType="deamon"] 可选值 websocket服务类型
@@ -33,6 +33,7 @@
                 }),
                 name: 'default',
                 debug: false,
+                reconnect: true,
                 failNum: 3,
                 delayConnectTime: 3000,
                 pingTime: 2000,
@@ -113,10 +114,11 @@
         closeHandle(e = 'err') {
             this.connectNum++;
             if (this.opt.debug) {
-                console.log(`${this.opt.name}断开，${this.opt.delayConnectTime}ms后重连websocket,尝试连接第${this.connectNum}次。`, e);
+                console.warn(`${this.opt.name}断开，${this.opt.delayConnectTime}ms后重连websocket,尝试连接第${this.connectNum}次。`);
             }
             if (this.status !== 'close') {
-                if (this.connectNum < this.opt.failNum) {
+
+                if ((this.connectNum < this.opt.failNum) || (this.opt.failNum === -1)) {
                     setTimeout(() => {
                         if (this.opt.cmd) {
                             if (this.pingInterval !== undefined && this.pongInterval !== undefined) {
@@ -129,7 +131,7 @@
                     }, this.opt.delayConnectTime)
                 } else {
                     if (this.opt.debug) {
-                        console.log(`${this.opt.name}断开，重连websocket失败！`, e);
+                        console.error(`${this.opt.name}断开，重连websocket失败！`);
                     }
                     if (this.opt.cmd) {
                         if (this.pingInterval !== undefined && this.pongInterval !== undefined) {
@@ -142,7 +144,7 @@
                 }
             } else {
                 if (this.opt.debug) {
-                    console.log(`${this.name}websocket手动关闭`);
+                    console.warn(`${this.name}websocket手动关闭！`);
                 }
                 if (this.opt.cmd) {
                     if (this.pingInterval !== undefined && this.pongInterval !== undefined) {
@@ -158,14 +160,14 @@
         errorHandle(e = 'err') {
             // 错误处理
             if (this.opt.debug) {
-                console.log(`${this.opt.name}连接错误:`, e);
+                console.warn(`${this.opt.name}连接错误！`);
             }
         };
 
         // 手动关闭WebSocket
         closeMyself() {
             if (this.opt.debug) {
-                console.log(`关闭${this.name}`);
+                console.warn(`关闭${this.name}`);
             }
 
             this.status = 'close';
@@ -187,7 +189,7 @@
 
             this.pongInterval = setInterval(() => {
                 if (this.pingPong === 'ping') {
-                    this.closeHandle('pingPong没有改变为pong'); // 没有返回pong 重启webSocket
+                    this.closeHandle('pingPong没有改变为pong！'); // 没有返回pong 重启webSocket
                 } else {
                     if (this.opt.debug) {
                         console.log('返回pong');
