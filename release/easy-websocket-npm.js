@@ -42,7 +42,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             var defaultOpt = {
                 msgCb: function msgCb(evet) {
                     if (_this.opt.debug) {
-                        console.log('接收服务器消息的回调：', evet);
+                        console.log('接收服务器消息的回调：', evet.data);
                     }
                 },
                 name: 'default',
@@ -59,8 +59,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             };
             this.opt = Object.assign({}, defaultOpt, opt);
             this.ws = null; // websocket对象
-            this.connectNum = 0;
-            this.status = null;
+            this.connectNum = 0; // 已重连的次数
+            this.status = null; // websocket的状态
+            this.timer = null; //定时器
         }
 
         _createClass(EasyWebSocket, [{
@@ -71,13 +72,15 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 this.ws = new WebSocket(this.opt.url);
                 this.ws.onopen = function (e) {
                     // 连接 websocket 成功
+                    // 重置已重连次数
+                    _this2.resetConnectNum();
                     _this2.status = 'open';
                     if (_this2.opt.cmd) {
                         //是否开启心跳检测
                         _this2.heartCheck(_this2.opt.cmd);
                     }
                     if (_this2.opt.debug) {
-                        console.log(_this2.opt.name + "\u8FDE\u63A5\u6210\u529F", e);
+                        console.log(_this2.opt.name + "\u8FDE\u63A5\u5230" + e.currentTarget.url + "\u6210\u529F!");
                     }
                     //连接成功
                     _this2.opt.success && _this2.opt.success(_this2.opt.index);
@@ -108,11 +111,17 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     return _this2.opt.msgCb(evet);
                 };
                 this.ws.onerror = function (e) {
-                    _this2.errorHandle(e);
+                    return _this2.errorHandle(e);
                 };
                 this.ws.onclose = function (err) {
-                    _this2.closeHandle(err);
+                    return _this2.closeHandle(err);
                 };
+            }
+        }, {
+            key: "resetConnectNum",
+            value: function resetConnectNum() {
+                // 重置已重连的次数为0
+                this.connectNum = 0;
             }
         }, {
             key: "onMessage",
@@ -144,9 +153,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     console.warn(this.opt.name + "\u65AD\u5F00\uFF0C" + this.opt.delayConnectTime + "ms\u540E\u91CD\u8FDEwebsocket,\u5C1D\u8BD5\u8FDE\u63A5\u7B2C" + this.connectNum + "\u6B21\u3002");
                 }
                 if (this.status !== 'close') {
-
                     if (this.connectNum < this.opt.failNum || this.opt.failNum === -1) {
-                        setTimeout(function () {
+                        this.timer = setTimeout(function () {
                             if (_this3.opt.cmd) {
                                 if (_this3.pingInterval !== undefined && _this3.pongInterval !== undefined) {
                                     // 清除定时器
@@ -154,6 +162,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                                     clearInterval(_this3.pongInterval);
                                 }
                             }
+                            //清除计时器
+                            clearTimeout(_this3.timer);
+                            //关闭websocket连接
+                            _this3.ws.close();
                             _this3.connect(); // 重连
                         }, this.opt.delayConnectTime);
                     } else {
@@ -171,7 +183,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                     }
                 } else {
                     if (this.opt.debug) {
-                        console.warn(this.name + "websocket\u624B\u52A8\u5173\u95ED\uFF01");
+                        console.warn(this.opt.name + "websocket\u624B\u52A8\u5173\u95ED\uFF01");
                     }
                     if (this.opt.cmd) {
                         if (this.pingInterval !== undefined && this.pongInterval !== undefined) {
@@ -199,7 +211,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             // 手动关闭WebSocket
             value: function closeMyself() {
                 if (this.opt.debug) {
-                    console.warn("\u5173\u95ED" + this.name);
+                    console.warn("\u5173\u95ED" + this.opt.name);
                 }
 
                 this.status = 'close';

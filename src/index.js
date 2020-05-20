@@ -28,7 +28,7 @@
             const defaultOpt = {
                 msgCb: ((evet) => {
                     if (this.opt.debug) {
-                        console.log('接收服务器消息的回调：', evet);
+                        console.log('接收服务器消息的回调：', evet.data);
                     }
                 }),
                 name: 'default',
@@ -45,20 +45,23 @@
             };
             this.opt = Object.assign({}, defaultOpt, opt);
             this.ws = null; // websocket对象
-            this.connectNum = 0;
-            this.status = null;
+            this.connectNum = 0;// 已重连的次数
+            this.status = null; // websocket的状态
+            this.timer = null;//定时器
         }
 
         connect(data) {
             this.ws = new WebSocket(this.opt.url);
             this.ws.onopen = (e) => {
                 // 连接 websocket 成功
+                // 重置已重连次数
+                this.resetConnectNum();
                 this.status = 'open';
                 if (this.opt.cmd) { //是否开启心跳检测
                     this.heartCheck(this.opt.cmd);
                 }
                 if (this.opt.debug) {
-                    console.log(`${this.opt.name}连接成功`, e);
+                    console.log(`${this.opt.name}连接到${e.currentTarget.url}成功!`);
                 }
                 //连接成功
                 this.opt.success && this.opt.success(this.opt.index);
@@ -89,12 +92,17 @@
                 return this.opt.msgCb(evet);
             };
             this.ws.onerror = (e) => {
-                this.errorHandle(e);
+                return this.errorHandle(e);
             };
             this.ws.onclose = (err) => {
-                this.closeHandle(err);
+                return this.closeHandle(err);
             }
         };
+
+        resetConnectNum() {
+            // 重置已重连的次数为0
+            this.connectNum = 0;
+        }
 
         onMessage(callback) {
             // 自定义 接受消息函数
@@ -117,9 +125,8 @@
                 console.warn(`${this.opt.name}断开，${this.opt.delayConnectTime}ms后重连websocket,尝试连接第${this.connectNum}次。`);
             }
             if (this.status !== 'close') {
-
                 if ((this.connectNum < this.opt.failNum) || (this.opt.failNum === -1)) {
-                    setTimeout(() => {
+                    this.timer = setTimeout(() => {
                         if (this.opt.cmd) {
                             if (this.pingInterval !== undefined && this.pongInterval !== undefined) {
                                 // 清除定时器
@@ -127,6 +134,10 @@
                                 clearInterval(this.pongInterval);
                             }
                         }
+                        //清除计时器
+                        clearTimeout(this.timer);
+                        //关闭websocket连接
+                        this.ws.close();
                         this.connect(); // 重连
                     }, this.opt.delayConnectTime)
                 } else {
@@ -144,7 +155,7 @@
                 }
             } else {
                 if (this.opt.debug) {
-                    console.warn(`${this.name}websocket手动关闭！`);
+                    console.warn(`${this.opt.name}websocket手动关闭！`);
                 }
                 if (this.opt.cmd) {
                     if (this.pingInterval !== undefined && this.pongInterval !== undefined) {
@@ -167,7 +178,7 @@
         // 手动关闭WebSocket
         closeMyself() {
             if (this.opt.debug) {
-                console.warn(`关闭${this.name}`);
+                console.warn(`关闭${this.opt.name}`);
             }
 
             this.status = 'close';
@@ -194,7 +205,7 @@
                     if (this.opt.debug) {
                         console.log('返回pong');
                     }
-                    this.pingPong = 'ping';  // 重置为ping 若下一次 ping 发送失败 或者pong返回失败(pingPong不会改成pong)，将重启.
+                    this.pingPong = 'ping'; // 重置为ping 若下一次 ping 发送失败 或者pong返回失败(pingPong不会改成pong)，将重启.
                 }
             }, this.opt.pongTime)
         }
