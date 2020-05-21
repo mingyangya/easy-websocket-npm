@@ -48,9 +48,12 @@
             this.connectNum = 0;// 已重连的次数
             this.status = null; // websocket的状态
             this.timer = null;//定时器
+            this.message = null;//连接成功后发送的消息
         }
 
         connect(data) {
+            //保存发送的消息，在断线重连的时候发送。
+            data && (this.message = data);
             this.ws = new WebSocket(this.opt.url);
             this.ws.onopen = (e) => {
                 // 连接 websocket 成功
@@ -138,7 +141,7 @@
                         clearTimeout(this.timer);
                         //关闭websocket连接
                         this.ws.close();
-                        this.connect(); // 重连
+                        this.connect(this.message); // 重连
                     }, this.opt.delayConnectTime)
                 } else {
                     if (this.opt.debug) {

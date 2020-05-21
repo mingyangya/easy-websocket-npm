@@ -62,6 +62,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             this.connectNum = 0; // 已重连的次数
             this.status = null; // websocket的状态
             this.timer = null; //定时器
+            this.message = null; //连接成功后发送的消息
         }
 
         _createClass(EasyWebSocket, [{
@@ -69,6 +70,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             value: function connect(data) {
                 var _this2 = this;
 
+                //保存发送的消息，在断线重连的时候发送。
+                data && (this.message = data);
                 this.ws = new WebSocket(this.opt.url);
                 this.ws.onopen = function (e) {
                     // 连接 websocket 成功
@@ -166,7 +169,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                             clearTimeout(_this3.timer);
                             //关闭websocket连接
                             _this3.ws.close();
-                            _this3.connect(); // 重连
+                            _this3.connect(_this3.message); // 重连
                         }, this.opt.delayConnectTime);
                     } else {
                         if (this.opt.debug) {

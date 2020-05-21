@@ -1,6 +1,6 @@
 {
   "name": "easy-websocket-npm",
-  "version": "0.0.10",
+  "version": "0.0.11",
   "description": "基于es6的websocket",
   "main": "release/easy-websocket-npm.js",
   "scripts": {
@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/haochn/easy-websocket-npm.git"
+    "url": "git+https://github.com/mingyangya/easy-websocket-npm.git"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
@@ -24,7 +24,7 @@
   "author": "haomingyang",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/haochn/easy-websocket-npm/issues"
+    "url": "https://github.com/mingyangya/easy-websocket-npm/issues"
   },
-  "homepage": "https://github.com/haochn/easy-websocket-npm#readme"
+  "homepage": "https://github.com/mingyangya/easy-websocket-npm#readme"
 }

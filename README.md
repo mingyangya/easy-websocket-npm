@@ -1,7 +1,7 @@
 # easy-websocket-npm
 ## 介绍
 
-基于HTML5的WebSocket对象，整合Websocket的连接、断开、发送消息、接受消息、以及断线重连、心跳检测等，让你更加简单的处理消息的发送和接受。
+基于HTML5的WebSocket对象，整合Websocket的连接、断开、发送消息、接受消息、以及断线重连、心跳检测等，让你更加简单的处理消息的发送和接收。
 
 - 文档：[Document](https://github.com/mingyangya/easy-websocket-npm/wiki)
 - 源码：[https://github.com/mingyangya/easy-websocket-npm](https://github.com/mingyangya/easy-websocket-npm) （欢迎 star）
